@@ -1,4 +1,3 @@
-cd /home/jenkins/workspace/TestPipeline/elk-stack
 FILES=$(ls *.yaml)
 for file in $FILES
 do
