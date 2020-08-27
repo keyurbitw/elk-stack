@@ -2,7 +2,7 @@ FILES=$(ls *.yaml)
 for file in $FILES
 do
   echo "Validating $file"
-  python -c 'import yaml, sys; yaml.safe_load(sys.stdin)' < $file
+  python3 -c 'import yaml, sys; yaml.safe_load(sys.stdin)' < $file
   statuscode=$(echo $?)
   if [ $statuscode -eq 0 ]
   then
