@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testing-slave
+  namespace: testing
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: testing-slave
+        image: yauritux/busybox-curl
+        command: [ 'sh', '-c' ]
+        args:
+        - while true; do
+            status_code=$(curl -s -I nginx-controller-service.controller | grep HTTP/1.1 | tr -s ' ' | cut -d '-' -f7 | cut -d ' ' -f2);
+            connected=$(curl -s -I nginx-controller-service.controller | grep HTTP/1.1 | tr -s ' ' | cut -d '-' -f7 | cut -d ' ' -f3);
+            echo "$hostname-$namespace-$pod_ip StatusCode - $status_code Connected - $connected";
+            sleep 600;
+          done
+        env:
+        - name: namespace
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: pod_ip
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: hostname
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: node_name
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch-data
+  namespace: obs
+spec:
+  serviceName: elasticsearch-logging
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: elasticsearch-logging
+  template:
+    metadata:
+      labels:
+        k8s-app: elasticsearch-logging
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        ports: 
+        - containerPort: 9200
+          protocol: TCP
+        - containerPort: 9300
+          protocol: TCP 
+        volumeMounts:
+        - name: elastic-data
+          mountPath: /data
+        env:
+          - name: cluster.name
+            value: kubernetes-logging
+          - name: node.name
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name 
+          - name: discovery.seed_hosts
+            value: "elasticsearch-data-0.elasticsearch-logging"
+          - name: cluster.initial_master_nodes
+            value: "elasticsearch-data-0"
+          - name: ES_JAVA_OPTS
+            value: "-Xms512m -Xmx512m"
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /data"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: elastic-data
+          mountPath: /data
+      volumes:
+        - name: elastic-data
+          emptyDir: {}

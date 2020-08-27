@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana-logging
+  namespace: obs
+  labels:
+    k8s-app: kibana-logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kibana-logging
+  template:
+    metadata:
+      labels:
+        k8s-app: kibana-logging
+    spec:	
+      volumes:
+      - name: kibana-config
+        configMap:
+          name: kibana-configmap   
+      containers:
+      - name: kibana-logging
+        image: docker.elastic.co/kibana/kibana:7.9.0
+        env:
+          - name: elasticsearch.hosts
+            value: http://elasticsearch-logging:9200
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - name: kibana-config
+          mountPath: /usr/share/kibana/config/kibana.yml
+          subPath: kibana.yml
+        ports:
+        - containerPort: 5601
+          name: ui
+          protocol: TCP
+

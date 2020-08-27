@@ -1,0 +1,39 @@
+input{
+      file{
+        type => "es-logs"
+        path => "/var/log/conatiners/elasticsearch-logging*.log"
+        start_position => "beginning"
+      }
+
+      file{
+        type => "kibana-logs"
+        path => "/var/log/conatiners/kibana-logging*.log"
+        start_position => "beginning"
+      }
+
+      file{
+        ype => "logstash-logs"
+        path => "/var/log/conatiners/logstash-deployment*.log"
+        start_position => "beginning"
+      }
+   }
+
+    output {
+        if [type] == "kibana-logs"{
+           elasticsearch {
+              hosts => [ "elasticsearch-logging:9200" ]
+              index => "logstash_kibana"
+        }
+
+        if [type] == "es-logs"{
+           elasticsearch {
+              hosts => [ "elasticsearch-logging:9200" ]
+              index => "logstash_elastic-search"
+        }
+
+        if [type] == "logstash-logs"{
+           elasticsearch {
+              hosts => [ "elasticsearch-logging:9200" ]
+              index => "logstash_logs"
+        }
+    }

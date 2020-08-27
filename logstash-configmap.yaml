@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap
+  namespace: obs
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+  logstash.conf: |
+    input{
+      beats{
+        port => 5044
+      }
+    }
+   
+    filter{
+      if "%{[kubernetes][namespace]}" == "controller" {
+        dissect {
+          mapping => {
+            "message" => "%{from} - - %{query-time}"
+          }
+        }
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["http://elasticsearch-logging:9200"]
+        index => "logstash-%{[kubernetes][namespace]}"
+      }
+    }
+
