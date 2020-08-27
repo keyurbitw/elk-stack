@@ -9,5 +9,7 @@ do
     echo "$file was proper yaml file"
   else
     echo "$file is not in proper yaml format. Please modify it"
+    exit(0)
   fi
+  sleep 10
 done
