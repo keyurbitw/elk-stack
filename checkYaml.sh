@@ -11,5 +11,5 @@ do
     echo "$file is not in proper yaml format. Please modify it"
     exit 0
   fi
-  sleep 10
+  sleep 2
 done
