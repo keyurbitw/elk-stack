@@ -1,5 +1,5 @@
 kubectl get po -n obs --kubeconfig=/home/.kube/config
-restartCount=$(kubectl get po -n obs --kubeconfig=/home/ec2-user/.kube/config -o jsonpath={'$.items[*].status.containerStatuses[*].restartCount'})
+restartCount=$(kubectl get po -n obs --kubeconfig=/home/.kube/config -o jsonpath='{.items[*].status.containerStatuses[*].restartCount}')
 for count in $restartCount
 do
 	if [ $count -ge 2 ]
@@ -10,7 +10,7 @@ do
 	fi
 done
 
-notRunningPods=$(kubectl get po -n obs -o --kubeconfig=/home/ec2-user/.kube/config jsonpath='{.items[*].status.containerStatuses[?(@.started==false)].name}')
+notRunningPods=$(kubectl get po -n obs --kubeconfig=/home/.kube/config -o jsonpath='{.items[*].status.containerStatuses[?(@.started==false)].name}')
 if [[ -z "$notRunningPods" ]]
 then
 	echo "All Pods are Running!!"
@@ -19,7 +19,7 @@ else
 	exit 0
 fi
 
-nodeStatus=$(kubectl get nodes -o jsonpath='{$.items[*].status.conditions[3].type}' --kubeconfig=/home/ec2-user/.kube/config)
+nodeStatus=$(kubectl get nodes --kubeconfig=/home/.kube/config -o jsonpath='{.items[*].status.conditions[3].type}')
 if [[ $nodeStatus -eq "Ready" ]]
 then
 	echo "Kubelet is in ready state!!"
