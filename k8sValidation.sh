@@ -22,7 +22,7 @@ fi
 nodeStatus=$(kubectl get nodes --kubeconfig=/home/.kube/config -o jsonpath='{.items[*].status.conditions[3].type}')
 if [[ $nodeStatus -eq "Ready" ]]
 then
-	echo "Kubelet is in ready state!!"
+	echo "Kubelet is in ready state"
 else
 	echo "Kubelet is not in ready state. Stopping execution"
 	exit 0
