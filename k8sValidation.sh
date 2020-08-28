@@ -11,7 +11,7 @@ do
 done
 
 notRunningPods=$(kubectl get po -n obs --kubeconfig=/home/.kube/config -o jsonpath='{.items[*].status.containerStatuses[?(@.started==false)].name}')
-if [[ -z "$notRunningPods" ]]
+if [ -z "$notRunningPods" ]
 then
 	echo "All Pods are Running!!"
 else
